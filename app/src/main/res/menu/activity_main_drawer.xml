@@ -10,6 +10,8 @@
             android:title="Export to Server" />
         <item android:id="@+id/nav_sync" android:icon="@android:drawable/ic_popup_sync"
             android:title="Sync Database Server" />
+        <item android:id="@+id/nav_logout" android:icon="@android:drawable/ic_menu_delete"
+            android:title="Log Out." />
     </group>
 
     <!--<item android:title="Communicate">-->

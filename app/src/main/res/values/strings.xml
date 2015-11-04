@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">Meter Check</string>
+    <string name="app_mainname">Meter Scan</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_name">Fullname</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="title_activity_sync">SyncActivity</string>
+    <string name="btn_begin_sync">Begin Sync Database</string>
 </resources>
