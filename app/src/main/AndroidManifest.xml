@@ -30,10 +30,13 @@
             android:label="@string/app_mainname" />
         <activity
             android:name=".SyncActivity"
-            android:label="@string/title_activity_sync"
-            android:theme="@style/AppTheme" >
+            android:label="@string/title_activity_sync" >
         </activity>
         <activity android:name=".ExportActivity" >
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

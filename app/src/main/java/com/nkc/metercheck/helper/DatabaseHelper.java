@@ -44,13 +44,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_TERMS = "terms";
     private static final String KEY_YEARS = "years";
     private static final String KEY_ROOM_ID = "room_id";
-    private static final String KEY_METER_NUMBER = "meter_number";
+    private static final String KEY_METER_START = "meter_start";
+    private static final String KEY_METER_END = "meter_end";
     private static final String KEY_PAY_TYPE = "pay_type";
 
     // Table Create Statements
     // Room table create statement
     private static final String CREATE_TABLE_ROOM = "CREATE TABLE "
-            + TABLE_ROOM + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_DORM_ID
+            + TABLE_ROOM + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ROOM_ID + " TEXT," + KEY_DORM_ID
             + " INTEGER," + KEY_CAPACITY + " INTEGER," + KEY_TOILET
             + " INTEGER," + KEY_ROOM_TYPE + " TEXT," + KEY_ROOM_STATUS
             + " INTEGER" + ")";
@@ -59,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_METER = "CREATE TABLE "
             + TABLE_METER + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ROOM_ID
             + " TEXT," + KEY_MONTHS + " INTEGER," + KEY_TERMS
-            + " INTEGER," + KEY_YEARS + " TEXT," + KEY_METER_NUMBER
+            + " INTEGER," + KEY_YEARS + " TEXT," + KEY_METER_START + " FLOAT," + KEY_METER_END
             + " FLOAT," + KEY_PAY_TYPE + " INTEGER," + KEY_CREATED_AT + "DATETIME)";
 
     public DatabaseHelper(Context context) {
@@ -85,14 +86,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // ------------------------ "Room" table methods ----------------//
-    public void createRoom(Integer dorm_id, Integer capacity, Integer toilet, String room_type, Integer room_status){
+    public void createRoom(String room_id, Integer dorm_id, Integer capacity, Integer toilet, String room_type, Integer room_status){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+        values.put(KEY_ROOM_ID, room_id);
         values.put(KEY_DORM_ID, dorm_id);
         values.put(KEY_CAPACITY, capacity);
         values.put(KEY_TOILET, toilet);
-        values.put(KEY_ROOM_TYPE, room_type.toString());
+        values.put(KEY_ROOM_TYPE, room_type);
         values.put(KEY_ROOM_STATUS, room_status);
 
         // Inserting Row
@@ -104,15 +106,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // ------------------------ "Meter" table methods ----------------//
-    public void createMeter(String room_id, Integer months, Integer terms, String years, Float meter_number, Integer pay_type){
+    public void createMeter(String room_id, Integer months, Integer terms, String years, Float meter_start, Float meter_end, Integer pay_type){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_ROOM_ID, room_id.toString());
+        values.put(KEY_ROOM_ID, room_id);
         values.put(KEY_MONTHS, months);
         values.put(KEY_TERMS, terms);
-        values.put(KEY_YEARS, years.toString());
-        values.put(KEY_METER_NUMBER, meter_number);
+        values.put(KEY_YEARS, years);
+        values.put(KEY_METER_START, meter_start);
+        values.put(KEY_METER_END, meter_end);
         values.put(KEY_PAY_TYPE, pay_type);
         values.put(KEY_CREATED_AT, getDateTime());
 
