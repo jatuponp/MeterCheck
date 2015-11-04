@@ -53,8 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
                 integrator.addExtra("SCAN_WIDTH", 640);
                 integrator.addExtra("SCAN_HEIGHT", 480);

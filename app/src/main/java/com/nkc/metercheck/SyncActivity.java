@@ -12,6 +12,7 @@ import android.widget.TextView;
 public class SyncActivity extends AppCompatActivity {
     private ProgressDialog pDialog;
     private TextView txtStatus;
+    private TextView txtStatus1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,8 @@ public class SyncActivity extends AppCompatActivity {
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
 
-        txtStatus = (TextView) findViewById(R.id.textView);
+        txtStatus = (TextView) findViewById(R.id.txtSyncStatus);
+        txtStatus1 = (TextView) findViewById(R.id.txtSyncStatus1);
 
         Button btnSync = (Button) findViewById(R.id.button);
         btnSync.setOnClickListener(new View.OnClickListener() {
@@ -39,9 +41,8 @@ public class SyncActivity extends AppCompatActivity {
         pDialog.setMessage("Synchronize Database. Please wait...");
         showDialog();
 
-//        txtStatus.append("Synchronize Table Room: OK.");
-//        txtStatus.append("Synchronize Table Meter: OK.");
-        //txtStatus.setText("");
+        txtStatus.setText("Synchronize Table Room: OK.");
+        txtStatus1.setText("Synchronize Table Meter: OK.");
 
         hideDialog();
     }
