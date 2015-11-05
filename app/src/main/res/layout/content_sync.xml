@@ -12,30 +12,39 @@
     tools:context=".SyncActivity"
     tools:showIn="@layout/activity_sync">
 
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_begin_sync" />
+
     <TextView
         android:id="@+id/txtSyncStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_below="@+id/button"
         android:text="" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtSyncStatus"
+        android:layout_centerHorizontal="true"
+        android:text="@string/btn_getmeter" />
+
 
     <TextView
         android:id="@+id/txtSyncStatus1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtSyncStatus"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/button2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="42dp"
         android:text="" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtSyncStatus1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="52dp"
-        android:text="@string/btn_begin_sync" />
+
 </RelativeLayout>

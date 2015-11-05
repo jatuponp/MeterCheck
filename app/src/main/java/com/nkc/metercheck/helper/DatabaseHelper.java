@@ -1,13 +1,18 @@
 package com.nkc.metercheck.helper;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.util.Log;
 
+import com.nkc.metercheck.model.Room;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -60,8 +65,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_METER = "CREATE TABLE "
             + TABLE_METER + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_ROOM_ID
             + " TEXT," + KEY_MONTHS + " INTEGER," + KEY_TERMS
-            + " INTEGER," + KEY_YEARS + " TEXT," + KEY_METER_START + " FLOAT," + KEY_METER_END
-            + " FLOAT," + KEY_PAY_TYPE + " INTEGER," + KEY_CREATED_AT + "DATETIME)";
+            + " INTEGER," + KEY_YEARS + " TEXT," + KEY_METER_START + " TEXT," + KEY_METER_END
+            + " TEXT," + KEY_PAY_TYPE + " INTEGER," + KEY_CREATED_AT + " DATETIME)";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -103,10 +108,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOG, "New Room inserted into sqlite: " + id);
     }
 
-
-
     // ------------------------ "Meter" table methods ----------------//
-    public void createMeter(String room_id, Integer months, Integer terms, String years, Float meter_start, Float meter_end, Integer pay_type){
+    public void createMeter(String room_id, Integer months, Integer terms, String years, String meter_start, String meter_end, Integer pay_type){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -123,6 +126,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long id = db.insert(TABLE_METER, null, values);
 
         Log.d(LOG, "New Meter inserted into sqlite: " + id);
+    }
+
+    // Check meter
+    public int chkMeter(String room_id, Integer months, Integer terms, String Years){
+
+        String query = "SELECT * FROM " + TABLE_METER + " WHERE " + KEY_ROOM_ID
+                + "='" + room_id + "' AND " + KEY_MONTHS + "=" + months
+                + " AND " + KEY_TERMS + "=" + terms + " AND " + KEY_YEARS
+                + "='" + Years + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count;
+    }
+
+    // Check room
+    public int chkRoom(String room_id){
+
+        String query = "SELECT * FROM " + TABLE_ROOM + " WHERE " + KEY_ROOM_ID + "='" + room_id +  "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count;
+    }
+
+    // getting all rooms
+    public List<Room> getAllRooms(Integer month){
+        ArrayList<Room> rooms = new ArrayList<Room>();
+        String selectQuery = "SELECT * FROM " + TABLE_ROOM + " LEFT JOIN " + TABLE_METER
+                + " ON " + TABLE_ROOM + "." + KEY_ROOM_ID + "=" + TABLE_METER + "." + KEY_ROOM_ID
+                + " WHERE " + TABLE_METER + "." + KEY_MONTHS + "=" + month;
+
+        Log.i("selectQuery", selectQuery);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if(c.moveToFirst()){
+            do{
+                Room r = new Room();
+                r.setRoomId(c.getString(c.getColumnIndex(KEY_ROOM_ID)));
+                r.setMeterStart(c.getString(c.getColumnIndex(KEY_METER_START)));
+                r.setMeterEnd(c.getString(c.getColumnIndex(KEY_METER_END)));
+
+                rooms.add(r);
+            } while (c.moveToNext());
+        }
+        this.closeDB();
+        return rooms;
     }
 
     // closing database

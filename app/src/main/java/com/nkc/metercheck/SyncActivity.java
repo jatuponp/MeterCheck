@@ -56,6 +56,14 @@ public class SyncActivity extends AppCompatActivity {
                 syncDatabase();
             }
         });
+
+        Button btnMeter = (Button) findViewById(R.id.button2);
+        btnMeter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                syncMeter();
+            }
+        });
     }
 
     /**
@@ -92,6 +100,7 @@ public class SyncActivity extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         Log.d(TAG, response.toString());
 
+                        int j = 0;
                         for (int i = 0; i < response.length(); i++) {
                             try {
                                 JSONObject obj = response.getJSONObject(i);
@@ -101,13 +110,17 @@ public class SyncActivity extends AppCompatActivity {
                                 Integer toilet = Integer.valueOf(obj.getString("toilet"));
                                 String room_type = obj.getString("room_type");
                                 Integer room_status = Integer.valueOf(obj.getString("room_status"));
-                                db.createRoom(room_id, dorm_id, capacity,toilet,room_type, room_status);
+                                int cnt = db.chkRoom(room_id);
+                                if(cnt == 0) {
+                                    db.createRoom(room_id, dorm_id, capacity, toilet, room_type, room_status);
+                                    j++;
+                                }
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        txtStatus.setText("Synchronize Table Room: OK.");
+                        txtStatus.setText("Synchronize Table Room: " + j + " Record OK.");
                     }
                 },
                 new Response.ErrorListener() {
@@ -126,6 +139,67 @@ public class SyncActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 //params.put(ARG_USERID, getArguments().getString(ARG_USERID));
                 //params.put(ARG_STATUS, getArguments().getString(ARG_STATUS));
+                return params;
+            }
+
+        };
+
+        AppController.getInstance().addToRequestQueue(roomReq, "getInbox");
+        db.closeDB();
+        hideDialog();
+    }
+
+    private void syncMeter() {
+        pDialog.setMessage("Synchronize Meter Database. Please wait...");
+        showDialog();
+        db = new DatabaseHelper(getApplicationContext());
+
+        JsonArrayRequest roomReq = new JsonArrayRequest(Request.Method.POST, AppConfig.URL_GETMETER,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
+
+                        int count = 0;
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                JSONObject obj = response.getJSONObject(i);
+                                String room_id = obj.getString("room_id");
+                                Integer months = Integer.valueOf(obj.getString("months"));
+                                Integer terms = Integer.valueOf(obj.getString("terms"));
+                                String years = obj.getString("years");
+                                String meter_start = obj.getString("meter_start");
+                                String meter_end = obj.getString("meter_end");
+                                Integer pay_type = Integer.valueOf(obj.getString("pay_type"));
+
+                                //check local store meter
+                                int cnt = db.chkMeter(room_id, months, terms, years);
+                                if(cnt == 0) {
+                                    db.createMeter(room_id, months, terms, years, meter_start, meter_end, pay_type);
+                                    count++;
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        txtStatus1.setText("Synchronize Table Meter: " + count + "record OK.");
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "Error: " + error.getMessage());
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        hideDialog();
+                    }
+
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                // Posting parameters to getInbox url
+                Map<String, String> params = new HashMap<String, String>();
                 return params;
             }
 

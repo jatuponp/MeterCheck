@@ -2,11 +2,8 @@ package com.nkc.metercheck;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,26 +14,71 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.nkc.metercheck.helper.DatabaseHelper;
 import com.nkc.metercheck.helper.SQLiteHandler;
 import com.nkc.metercheck.helper.SessionManager;
+import com.nkc.metercheck.model.Room;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private SQLiteHandler db;
     private SessionManager session;
+    private List<Room> roomList = new ArrayList<Room>();
+    private ListView listView;
+    private CustomListAdapter adapter;
+    private DatabaseHelper dbRoom;
     Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*// Spinner element
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+
+        // Spinner click listener
+        spinner.setOnItemSelectedListener(this);
+
+        // Spinner Drop down elements
+        List<String> categories = new ArrayList<String>();
+        categories.add("เลือกเดือน");
+        categories.add("มกราคม");
+        categories.add("กุมภาพันธ์");
+        categories.add("Education");
+        categories.add("Personal");
+        categories.add("Travel");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapter);*/
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.months_titles, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
 
         context = getApplicationContext();
         session = new SessionManager(context);
@@ -71,6 +113,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        listRoom();
+    }
+
+    public void listRoom(){
+        listView = (ListView) findViewById(R.id.listView);
+        adapter = new CustomListAdapter(this, roomList);
+        listView.setAdapter(adapter);
+        dbRoom = new DatabaseHelper(context);
+
+        roomList.clear();
+
+        Integer month = 10;
+        List<Room> row = dbRoom.getAllRooms(month);
+        for (Room r : row){
+            Room room = new Room();
+            room.setRoomId(r.getRoomId());
+            room.setMeterStart(r.getMeterStart());
+            room.setMeterEnd(r.getMeterEnd());
+
+            roomList.add(room);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -129,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //} else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_export) {
-            Intent intent = new Intent(MainActivity.this, ExportActivity.class);
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_sync) {
             Intent intent = new Intent(MainActivity.this, SyncActivity.class);
@@ -155,5 +221,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+
+        // Showing selected spinner item
+        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+
+    }
+
+    public void onNothingSelected(AdapterView arg0) {
+        // TODO Auto-generated method stub
+
     }
 }
