@@ -32,7 +32,8 @@
             android:name=".SyncActivity"
             android:label="@string/title_activity_sync" >
         </activity>
-        <activity android:name=".ExportActivity" >
+        <activity android:name=".ExportActivity"
+            android:label="@string/title_activity_export">
         </activity>
         <activity
             android:name=".ScanActivity"

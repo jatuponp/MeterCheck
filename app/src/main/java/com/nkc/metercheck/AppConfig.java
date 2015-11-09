@@ -8,5 +8,6 @@ public class AppConfig {
     public static String URL_LOGIN = "https://it.nkc.kku.ac.th/backend/api/login";
     public static String URL_GETROOM = "https://it.nkc.kku.ac.th/backend/api/getroom";
     public static String URL_GETMETER = "https://it.nkc.kku.ac.th/backend/api/getmeter";
+    public static String URL_SEND_METER = "https://it.nkc.kku.ac.th/backend/api/sendmeter";
 
 }

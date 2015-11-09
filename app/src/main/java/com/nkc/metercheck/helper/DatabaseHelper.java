@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.util.Log;
 
+import com.nkc.metercheck.model.Meter;
 import com.nkc.metercheck.model.Room;
 
 import java.text.SimpleDateFormat;
@@ -220,6 +221,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         this.closeDB();
         return rooms;
+    }
+
+    // getting all rooms
+    public List<Meter> getAllMeter(Integer month, Integer term, String year) {
+        ArrayList<Meter> meters = new ArrayList<Meter>();
+        String selectQuery = "SELECT * FROM " + TABLE_METER + " WHERE " + KEY_MONTHS + "=" + month
+                + " AND " + KEY_TERMS + "=" + term + " AND " + KEY_YEARS + "='" + year + "'";
+
+        Log.i("selectQuery", selectQuery);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c.moveToFirst()) {
+            do {
+                Meter m = new Meter();
+                m.setRoomId(c.getString(c.getColumnIndex(KEY_ROOM_ID)));
+                m.setMonths(Integer.valueOf(c.getString(c.getColumnIndex(KEY_MONTHS))));
+                m.setTerms(Integer.valueOf(c.getString(c.getColumnIndex(KEY_TERMS))));
+                m.setYears(c.getString(c.getColumnIndex(KEY_YEARS)));
+                m.setMeterStart(c.getString(c.getColumnIndex(KEY_METER_START)));
+                m.setMeterEnd(c.getString(c.getColumnIndex(KEY_METER_END)));
+                m.setPayType(Integer.valueOf(c.getString(c.getColumnIndex(KEY_PAY_TYPE))));
+                m.setCreate(c.getString(c.getColumnIndex(KEY_CREATED_AT)));
+
+                meters.add(m);
+            } while (c.moveToNext());
+        }
+        this.closeDB();
+        return meters;
     }
 
     // closing database

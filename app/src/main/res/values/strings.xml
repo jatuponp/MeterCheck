@@ -32,4 +32,5 @@
 
     <string name="btn_getmeter">Synchronize Meter Database</string>
     <string name="title_activity_scan">บันทึกค่าไฟฟ้า</string>
+    <string name="title_activity_export">ส่งข้อมูลขึ้นเซิร์ฟเวอร์</string>
 </resources>
