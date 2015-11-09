@@ -244,11 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_barcode) {
-            // Handle the camera action
-        //} else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_export) {
+        if (id == R.id.nav_export) {
             Intent intent = new Intent(MainActivity.this, ExportActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_sync) {
