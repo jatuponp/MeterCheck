@@ -11,7 +11,7 @@
     <string name="hint_password">Password</string>
     <string name="hint_name">Fullname</string>
     <string name="btn_login">LOGIN</string>
-    <string name="title_activity_sync">SyncActivity</string>
+    <string name="title_activity_sync">ซิงค์ข้อมูลกับเซิร์ฟเวอร์</string>
     <string name="btn_begin_sync">Synchronize Room Database</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -31,5 +31,5 @@
     </string-array>
 
     <string name="btn_getmeter">Synchronize Meter Database</string>
-    <string name="title_activity_scan">ScanActivity</string>
+    <string name="title_activity_scan">บันทึกค่าไฟฟ้า</string>
 </resources>
