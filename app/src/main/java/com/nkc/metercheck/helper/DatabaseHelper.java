@@ -91,7 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // ------------------------ "Room" table methods ----------------//
-    public void createRoom(String room_id, Integer dorm_id, Integer capacity, Integer toilet, String room_type, Integer room_status){
+    public void createRoom(String room_id, Integer dorm_id, Integer capacity, Integer toilet, String room_type, Integer room_status) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -108,8 +108,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(LOG, "New Room inserted into sqlite: " + id);
     }
 
+    // ตรวจสอบข้อมูลห้อง
+    public int checkRoom(String room_id) {
+
+        String query = "SELECT * FROM " + TABLE_ROOM + " WHERE " + KEY_ROOM_ID + "='" + room_id + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count;
+    }
+
     // ------------------------ "Meter" table methods ----------------//
-    public void createMeter(String room_id, Integer months, Integer terms, String years, String meter_start, String meter_end, Integer pay_type){
+    public void createMeter(String room_id, Integer months, Integer terms, String years, String meter_start, String meter_end, Integer pay_type) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -129,7 +142,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Check meter
-    public int chkMeter(String room_id, Integer months, Integer terms, String Years){
+    public int chkMeter(String room_id, Integer months, Integer terms, String Years) {
 
         String query = "SELECT * FROM " + TABLE_METER + " WHERE " + KEY_ROOM_ID
                 + "='" + room_id + "' AND " + KEY_MONTHS + "=" + months
@@ -144,10 +157,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    // Check room
-    public int chkRoom(String room_id){
+    // Check meter
+    public String lastMeter(String room_id, Integer months, Integer terms, String Years) {
+        String meter = "0.00";
+        String query = "SELECT * FROM " + TABLE_METER + " WHERE " + KEY_ROOM_ID
+                + "='" + room_id + "' AND " + KEY_MONTHS + "=" + (months - 1)
+                + " AND " + KEY_TERMS + "=" + terms + " AND " + KEY_YEARS
+                + "='" + Years + "'";
 
-        String query = "SELECT * FROM " + TABLE_ROOM + " WHERE " + KEY_ROOM_ID + "='" + room_id +  "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            meter = cursor.getString(cursor.getColumnIndex(KEY_METER_END));
+        }
+
+        cursor.close();
+
+        return meter;
+    }
+
+    // Check room
+    public int chkRoom(String room_id) {
+
+        String query = "SELECT * FROM " + TABLE_ROOM + " WHERE " + KEY_ROOM_ID + "='" + room_id + "'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
@@ -158,18 +191,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // getting all rooms
-    public List<Room> getAllRooms(Integer month){
+    public List<Room> getAllRooms(Integer month, Integer term, String year, String search) {
         ArrayList<Room> rooms = new ArrayList<Room>();
-        String selectQuery = "SELECT * FROM " + TABLE_ROOM + " LEFT JOIN " + TABLE_METER
+        String selectQuery = "SELECT " + TABLE_ROOM + "." + KEY_ROOM_ID + ", " + TABLE_METER + "." + KEY_METER_START + ", "
+                + TABLE_METER + "." + KEY_METER_END + " FROM " + TABLE_ROOM + " LEFT JOIN " + TABLE_METER
                 + " ON " + TABLE_ROOM + "." + KEY_ROOM_ID + "=" + TABLE_METER + "." + KEY_ROOM_ID
-                + " WHERE " + TABLE_METER + "." + KEY_MONTHS + "=" + month;
+                + " WHERE (" + TABLE_METER + "." + KEY_MONTHS + "=" + month + " OR " + TABLE_METER + "." + KEY_MONTHS + " IS NULL) "
+                + "AND (" + TABLE_METER + "." + KEY_TERMS + "=" + term + " OR " + TABLE_METER + "." + KEY_TERMS + " IS NULL " + ") "
+                + "AND (" + TABLE_METER + "." + KEY_YEARS + "='" + year + "' OR " + TABLE_METER + "." + KEY_YEARS + " IS NULL)";
+
+        if (search != "") {
+            selectQuery += " AND " + TABLE_METER + "." + KEY_ROOM_ID + " LIKE '" + search + "'";
+        }
 
         Log.i("selectQuery", selectQuery);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
-        if(c.moveToFirst()){
-            do{
+        if (c.moveToFirst()) {
+            do {
                 Room r = new Room();
                 r.setRoomId(c.getString(c.getColumnIndex(KEY_ROOM_ID)));
                 r.setMeterStart(c.getString(c.getColumnIndex(KEY_METER_START)));
@@ -191,7 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * get datetime
-     * */
+     */
     private String getDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());

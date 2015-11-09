@@ -35,8 +35,9 @@
         <activity android:name=".ExportActivity" >
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:name=".ScanActivity"
+            android:label="@string/title_activity_scan"
+            android:theme="@style/AppTheme" >
         </activity>
     </application>
 

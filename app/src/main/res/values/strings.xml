@@ -102,4 +102,5 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="btn_getmeter">Synchronize Meter Database</string>
+    <string name="title_activity_scan">ScanActivity</string>
 </resources>

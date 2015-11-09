@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="top"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dip"
+            android:text=""
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dip"
+            android:text=""
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/txtMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:text="ประจำเดือนพฤศจิกายน ปีการศึกษา 1/2558"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" >
+
+            <EditText
+                android:id="@+id/room_id"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_toStartOf="@+id/btnScan"
+                android:hint="หมายเลขห้อง"
+                android:inputType="text"
+                android:padding="10dp"
+                android:width="200dp"
+                android:singleLine="true"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/btnScan" />
+
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:text="SCAN" />
+
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/meter_end"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:hint="เลขมิเตอร์"
+            android:inputType="numberDecimal"
+            android:padding="10dp"
+            android:singleLine="true" />
+
+        <!-- Login Button -->
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dip"
+            android:text="บันทึก" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dip"
+            android:text="โปรดตรวจสอบข้อมูลให้ถูกต้องก่อนบันทึกข้อมูล"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <!-- Link to Login Screen -->
+
+    </LinearLayout>
+
+</LinearLayout>

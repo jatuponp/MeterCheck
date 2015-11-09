@@ -12,21 +12,63 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <TextView
-        android:id="@+id/textView4"
+    <Spinner
+        android:id="@+id/spinnerMonth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="รายการบันทึกเลขมิเตอร์"
-        android:textStyle="bold"
-        android:textSize="16dp" />
+        android:layout_toLeftOf="@+id/spinnerTerms"
+        android:layout_toStartOf="@+id/spinnerTerms"
+        android:spinnerMode="dropdown" />
 
+    <Spinner
+        android:id="@+id/spinnerTerms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown"
+        android:layout_toLeftOf="@+id/tvSlash"
+        android:layout_toStartOf="@+id/tvSlash" />
+
+    <TextView
+        android:id="@+id/tvSlash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/"
+        android:layout_toLeftOf="@+id/spinnerYear"
+        android:layout_toStartOf="@+id/spinnerYear"/>
+
+    <Spinner
+        android:id="@+id/spinnerYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:spinnerMode="dropdown" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ค้นหา"
+        android:id="@+id/btnSearch"
+        android:layout_below="@+id/spinnerYear"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true" />
+
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="ค้นหาตามห้อง"
+        android:width="200dp"
+        android:layout_below="@+id/spinnerYear"
+        android:layout_toLeftOf="@+id/btnSearch"
+        android:layout_toStartOf="@+id/btnSearch" />
 
     <TextView
         android:id="@+id/head_room_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/btnSearch"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/textView4"
         android:text="หมายเลขห้อง"
         android:textStyle="bold" />
 
@@ -34,29 +76,29 @@
         android:id="@+id/head_meter_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ครั้งก่อน"
-        android:width="80dp"
-        android:gravity="right"
-        android:textAlignment="gravity"
-        android:textStyle="bold"
-        android:layout_below="@+id/textView4"
+        android:layout_below="@+id/btnSearch"
         android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/head_meter_end"
-        android:layout_toStartOf="@+id/head_meter_end" />
+        android:layout_toStartOf="@+id/head_meter_end"
+        android:width="80dp"
+        android:gravity="right"
+        android:text="ครั้งก่อน"
+        android:textAlignment="gravity"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/head_meter_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ครั้งหลัง"
-        android:width="80dp"
-        android:textAlignment="gravity"
-        android:gravity="right"
-        android:textStyle="bold"
-        android:layout_marginRight="6dp"
-        android:layout_alignTop="@+id/head_meter_start"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignTop="@+id/head_meter_start"
+        android:layout_marginRight="6dp"
+        android:width="80dp"
+        android:gravity="right"
+        android:text="ครั้งหลัง"
+        android:textAlignment="gravity"
+        android:textStyle="bold" />
 
     <ListView
         android:id="@+id/listView"
@@ -64,15 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="5dp"
-        android:layout_below="@+id/head_room_id" />
+        android:layout_below="@+id/head_room_id"
+        android:layout_marginTop="5dp" />
 
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner"
-        android:layout_alignBottom="@+id/textView4"
-        android:layout_alignParentRight="true"
-        android:dropDownWidth="100dp"
-        android:layout_alignParentEnd="true" />
 </RelativeLayout>

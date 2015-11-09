@@ -2,7 +2,9 @@ package com.nkc.metercheck;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
@@ -29,9 +33,10 @@ import com.nkc.metercheck.helper.SessionManager;
 import com.nkc.metercheck.model.Room;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private SQLiteHandler db;
@@ -41,37 +46,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CustomListAdapter adapter;
     private DatabaseHelper dbRoom;
     Context context;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        /*// Spinner element
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-
-        // Spinner click listener
-        spinner.setOnItemSelectedListener(this);
-
-        // Spinner Drop down elements
-        List<String> categories = new ArrayList<String>();
-        categories.add("เลือกเดือน");
-        categories.add("มกราคม");
-        categories.add("กุมภาพันธ์");
-        categories.add("Education");
-        categories.add("Personal");
-        categories.add("Travel");
-
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
-
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);*/
-
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerMonth);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.months_titles, android.R.layout.simple_spinner_item);
@@ -79,6 +62,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
+        final int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        final int thisYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+        spinner.setSelection(currentMonth);
+        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+                sharedPreferences.edit().putString(QuickstartPreferences.MONTHS, String.valueOf(position + 1)).apply();
+                String terms = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+                String years = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
+                int month = position + 1;
+                listRoom(month, Integer.valueOf(terms), years, "");
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+        // Set years
+        final ArrayList<String> years = new ArrayList<String>();
+        for (int i = thisYear - 3; i <= thisYear + 1; i++) {
+            years.add(Integer.toString(i));
+        }
+        ArrayAdapter<String> adapterYear = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, years);
+
+        Spinner spinYear = (Spinner)findViewById(R.id.spinnerYear);
+        spinYear.setAdapter(adapterYear);
+        spinYear.setSelection(3);
+        spinYear.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
+                String years = arg0.getItemAtPosition(position).toString();
+                sharedPreferences.edit().putString(QuickstartPreferences.YEARS, years).apply();
+                String months = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+                String terms = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+                listRoom(Integer.valueOf(months), Integer.valueOf(terms), years, "");
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+        ArrayList<String> terms = new ArrayList<String>();
+        for (int i = 1; i<=3; i++){
+            terms.add(Integer.toString(i));
+        }
+        ArrayAdapter<String> adapterTerms = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, terms);
+
+        Spinner spinTerm = (Spinner)findViewById(R.id.spinnerTerms);
+        spinTerm.setAdapter(adapterTerms);
+        String t = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+        spinTerm.setSelection(Integer.valueOf(t) - 1);
+        spinTerm.setOnItemSelectedListener(new OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
+                String terms = arg0.getItemAtPosition(position).toString();
+                sharedPreferences.edit().putString(QuickstartPreferences.TERMS, terms).apply();
+                String months = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+                String years = sharedPreferences.getString(QuickstartPreferences.YEARS, "1");
+                listRoom(Integer.valueOf(months), Integer.valueOf(terms), years, "");
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
 
         context = getApplicationContext();
         session = new SessionManager(context);
@@ -95,13 +142,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
-                integrator.addExtra("SCAN_WIDTH", 640);
-                integrator.addExtra("SCAN_HEIGHT", 480);
-                integrator.addExtra("SCAN_MODE", "QR_CODE_MODE,PRODUCT_MODE");
-                //customize the prompt message before scanning
-                integrator.addExtra("PROMPT_MESSAGE", "Scanner Start!");
-                integrator.initiateScan(IntentIntegrator.PRODUCT_CODE_TYPES);
+                Intent intent = new Intent(MainActivity.this, ScanActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -114,10 +156,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        listRoom();
+        Button btnSearch = (Button) findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int currentMonth = Calendar.getInstance().get(Calendar.MONTH)-1;
+                EditText etSearch = (EditText) findViewById(R.id.etSearch);
+
+                String months = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+                String terms = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+                String years = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
+                listRoom(Integer.valueOf(months), Integer.valueOf(terms), years, etSearch.getText().toString());
+            }
+        });
+
     }
 
-    public void listRoom(){
+    public void listRoom(int month, int term, String year, String search){
         listView = (ListView) findViewById(R.id.listView);
         adapter = new CustomListAdapter(this, roomList);
         listView.setAdapter(adapter);
@@ -125,8 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         roomList.clear();
 
-        Integer month = 10;
-        List<Room> row = dbRoom.getAllRooms(month);
+        List<Room> row = dbRoom.getAllRooms(month, term, year, search);
         for (Room r : row){
             Room room = new Room();
             room.setRoomId(r.getRoomId());
@@ -195,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //} else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_export) {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(MainActivity.this, ExportActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_sync) {
             Intent intent = new Intent(MainActivity.this, SyncActivity.class);
@@ -221,20 +275,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public void onItemSelected(AdapterView parent, View view, int position, long id) {
-        // On selecting a spinner item
-        String item = parent.getItemAtPosition(position).toString();
-
-        // Showing selected spinner item
-        Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-
-    }
-
-    public void onNothingSelected(AdapterView arg0) {
-        // TODO Auto-generated method stub
-
     }
 }
