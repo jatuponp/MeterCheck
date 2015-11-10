@@ -121,6 +121,7 @@ public class SyncActivity extends AppCompatActivity {
                             }
                         }
                         txtStatus.setText("Synchronize Table Room: " + j + " Record OK.");
+                        hideDialog();
                     }
                 },
                 new Response.ErrorListener() {
@@ -146,7 +147,6 @@ public class SyncActivity extends AppCompatActivity {
 
         AppController.getInstance().addToRequestQueue(roomReq, "getInbox");
         db.closeDB();
-        hideDialog();
     }
 
     private void syncMeter() {
@@ -184,6 +184,7 @@ public class SyncActivity extends AppCompatActivity {
                             }
                         }
                         txtStatus1.setText("Synchronize Table Meter: " + count + "record OK.");
+                        hideDialog();
                     }
                 },
                 new Response.ErrorListener() {
@@ -207,7 +208,6 @@ public class SyncActivity extends AppCompatActivity {
 
         AppController.getInstance().addToRequestQueue(roomReq, "getInbox");
         db.closeDB();
-        hideDialog();
     }
 
 

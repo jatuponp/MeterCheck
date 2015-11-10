@@ -65,10 +65,10 @@ public class ExportActivity extends AppCompatActivity {
             final String month = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
             final String term = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
             final String year = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
-            String[] mounthArray = getResources().getStringArray(R.array.months_titles);
+            String[] monthArray = getResources().getStringArray(R.array.months_titles);
 
             TextView txtCurrent = (TextView) findViewById(R.id.txtCurrent);
-            txtCurrent.setText("ประจำเดือน" + mounthArray[Integer.valueOf(month) - 1] + "\nปีการศึกษา " + term + "/" + year);
+            txtCurrent.setText("ประจำเดือน" + monthArray[Integer.valueOf(month) - 1] + "\nปีการศึกษา " + term + "/" + year);
 
             Button btnExport = (Button) findViewById(R.id.btnExport);
             btnExport.setOnClickListener(new View.OnClickListener() {

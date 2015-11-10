@@ -195,7 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Room> getAllRooms(Integer month, Integer term, String year, String search) {
         ArrayList<Room> rooms = new ArrayList<Room>();
         String selectQuery = "SELECT " + TABLE_ROOM + "." + KEY_ROOM_ID + ", " + TABLE_METER + "." + KEY_METER_START + ", "
-                + TABLE_METER + "." + KEY_METER_END + " FROM " + TABLE_ROOM + " LEFT JOIN " + TABLE_METER
+                + TABLE_METER + "." + KEY_METER_END + ", " + TABLE_METER + "." + KEY_ID + " FROM " + TABLE_ROOM + " LEFT JOIN " + TABLE_METER
                 + " ON " + TABLE_ROOM + "." + KEY_ROOM_ID + "=" + TABLE_METER + "." + KEY_ROOM_ID
                 + " WHERE (" + TABLE_METER + "." + KEY_MONTHS + "=" + month + " OR " + TABLE_METER + "." + KEY_MONTHS + " IS NULL) "
                 + "AND (" + TABLE_METER + "." + KEY_TERMS + "=" + term + " OR " + TABLE_METER + "." + KEY_TERMS + " IS NULL " + ") "
@@ -215,6 +215,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 r.setRoomId(c.getString(c.getColumnIndex(KEY_ROOM_ID)));
                 r.setMeterStart(c.getString(c.getColumnIndex(KEY_METER_START)));
                 r.setMeterEnd(c.getString(c.getColumnIndex(KEY_METER_END)));
+                Integer meterId;
+                if (c.isNull(c.getColumnIndex(KEY_ID))) {
+                    meterId = 0;
+                } else {
+                    meterId = Integer.valueOf(c.getString(c.getColumnIndex(KEY_ID)));
+                }
+                r.setMeterId(meterId);
 
                 rooms.add(r);
             } while (c.moveToNext());
@@ -250,6 +257,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         this.closeDB();
         return meters;
+    }
+
+    /**
+     * Deleting a meter
+     */
+    public void deleteMeter(Integer id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_METER, KEY_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
     // closing database

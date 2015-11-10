@@ -1,12 +1,16 @@
 package com.nkc.metercheck;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +29,10 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.nkc.metercheck.helper.DatabaseHelper;
@@ -43,10 +51,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SessionManager session;
     private List<Room> roomList = new ArrayList<Room>();
     private ListView listView;
+    private SwipeMenuListView mListView;
     private CustomListAdapter adapter;
     private DatabaseHelper dbRoom;
     Context context;
     SharedPreferences sharedPreferences;
+    float historicX = Float.NaN, historicY = Float.NaN;
+    static final int DELTA = 50;
+    enum Direction {LEFT, RIGHT;};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,9 +185,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void listRoom(int month, int term, String year, String search){
-        listView = (ListView) findViewById(R.id.listView);
+        //listView = (ListView) findViewById(R.id.listView);
+        mListView = (SwipeMenuListView) findViewById(R.id.listView);
         adapter = new CustomListAdapter(this, roomList);
-        listView.setAdapter(adapter);
+        //listView.setAdapter(adapter);
+        mListView.setAdapter(adapter);
         dbRoom = new DatabaseHelper(context);
 
         roomList.clear();
@@ -186,11 +200,119 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             room.setRoomId(r.getRoomId());
             room.setMeterStart(r.getMeterStart());
             room.setMeterEnd(r.getMeterEnd());
+            room.setMeterId(r.getMeterId());
 
             roomList.add(room);
         }
 
         adapter.notifyDataSetChanged();
+
+        // step 1. create a MenuCreator
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // create "delete" item
+                SwipeMenuItem deleteItem = new SwipeMenuItem(getApplicationContext());
+                // set item background
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(255,99,71)));
+                // set item width
+                deleteItem.setWidth(dp2px(60));
+                // set a icon
+                deleteItem.setIcon(android.R.drawable.ic_menu_delete);
+                // add to menu
+                menu.addMenuItem(deleteItem);
+            }
+        };
+        // set creator
+        mListView.setMenuCreator(creator);
+
+        // step 2. listener item click event
+        mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
+                final Room item = roomList.get(position);
+                switch (index) {
+                    case 0:
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Confirm")
+                                .setMessage("Do you want to Delete this item?")
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        try {
+                                            if(item.getMeterId() == 0){
+                                                Toast.makeText(getApplicationContext(), "ไม่พบข้อมูล", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                // delete
+                                                delete(item);
+                                                roomList.remove(position);
+                                                adapter.notifyDataSetChanged();
+                                                Toast.makeText(getApplicationContext(), "ลบข้อมูลห้อง " + item.getRoomId() + " เรียบร้อยแล้ว", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }catch (Exception e){
+                                            Toast.makeText(getApplicationContext(), "ไม่สามารถลบข้อมูลได้ โปรดลองอีกครั้ง", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }})
+                                .setNegativeButton(android.R.string.no, null).show();
+
+                        break;
+                }
+                return false;
+            }
+        });
+
+        // set SwipeListener
+        mListView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+
+            @Override
+            public void onSwipeStart(int position) {
+                // swipe start
+            }
+
+            @Override
+            public void onSwipeEnd(int position) {
+                // swipe end
+            }
+        });
+
+        // set MenuStateChangeListener
+        mListView.setOnMenuStateChangeListener(new SwipeMenuListView.OnMenuStateChangeListener() {
+            @Override
+            public void onMenuOpen(int position) {
+            }
+
+            @Override
+            public void onMenuClose(int position) {
+            }
+        });
+
+        // other setting
+//		listView.setCloseInterpolator(new BounceInterpolator());
+
+        // test item long click
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                Toast.makeText(getApplicationContext(), position + " long click", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+    }
+
+    private void delete(Room item) {
+        // delete app
+//        try {
+//            Intent intent = new Intent(Intent.ACTION_DELETE);
+//            intent.setData(Uri.fromParts("package", item.packageName, null));
+//            startActivity(intent);
+//        } catch (Exception e) {
+//        }
+        dbRoom.deleteMeter(item.getMeterId());
+        //Toast.makeText(getApplicationContext(), " Item ID: " + item.getMeterId(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -207,6 +329,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawers();
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+        String months = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+        String terms = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+        String years = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
+        listRoom(Integer.valueOf(months), Integer.valueOf(terms), years, "");
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -214,6 +350,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
     }
 
     @Override
