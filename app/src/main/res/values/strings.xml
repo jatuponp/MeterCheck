@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Meter Check</string>
+    <string name="app_name">Meter Scan</string>
     <string name="app_mainname">บันทึกค่าไฟฟ้า</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
