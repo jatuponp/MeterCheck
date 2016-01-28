@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Spinner spinYear = (Spinner)findViewById(R.id.spinnerYear);
         spinYear.setAdapter(adapterYear);
-        spinYear.setSelection(3);
+        spinYear.setSelection(2);
         spinYear.setOnItemSelectedListener(new OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
                 String years = arg0.getItemAtPosition(position).toString();
@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String terms = arg0.getItemAtPosition(position).toString();
                 sharedPreferences.edit().putString(QuickstartPreferences.TERMS, terms).apply();
                 String months = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
-                String years = sharedPreferences.getString(QuickstartPreferences.YEARS, "1");
+                String years = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
                 listRoom(Integer.valueOf(months), Integer.valueOf(terms), years, "");
             }
 

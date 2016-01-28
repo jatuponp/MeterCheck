@@ -161,10 +161,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Check meter
     public String lastMeter(String room_id, Integer months, Integer terms, String Years) {
         String meter = "0.00";
+        if(months == 1){
+            months = 13;
+        }
         String query = "SELECT * FROM " + TABLE_METER + " WHERE " + KEY_ROOM_ID
                 + "='" + room_id + "' AND " + KEY_MONTHS + "=" + (months - 1)
-                + " AND " + KEY_TERMS + "=" + terms + " AND " + KEY_YEARS
-                + "='" + Years + "'";
+                + " AND " + KEY_YEARS  + "='" + Years + "'";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);

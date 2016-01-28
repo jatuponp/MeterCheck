@@ -71,6 +71,15 @@
 
         </RelativeLayout>
 
+        <TextView
+            android:id="@+id/txtMeterStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="10dip"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
         <EditText
             android:id="@+id/meter_end"
             android:layout_width="fill_parent"

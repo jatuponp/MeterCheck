@@ -8,6 +8,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,9 +27,9 @@ import java.util.Calendar;
 public class ScanActivity extends AppCompatActivity {
 
     SharedPreferences sharedPreferences;
-    TextView txtMonth;
+    TextView txtMonth, txtMeter;
     EditText etRoomId, etMeter;
-    private DatabaseHelper db;
+    private DatabaseHelper db, db1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,37 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
+        etRoomId = (EditText) findViewById(R.id.room_id);
+        etRoomId.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                db1 = new DatabaseHelper(getApplicationContext());
+                //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+                //int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+                //int thisYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+                if (s.length() == 5) {
+
+                    String month = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+                    String term = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+                    String year = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
+                    String meterStart = db1.lastMeter(etRoomId.getText().toString(), Integer.valueOf(month), 1, year);
+                    txtMeter = (TextView) findViewById(R.id.txtMeterStart);
+                    txtMeter.setText("   ครั้งก่อน: " + meterStart);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         Button btnSave = (Button) findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +118,7 @@ public class ScanActivity extends AppCompatActivity {
 
         if (room_id.matches("") || meterEnd.matches("")) {
             Toast.makeText(this, "กรอกข้อมูลให้ครบถ้วน", Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             //check local store meter
             int cnt = db.chkMeter(room_id, month, term, year);
             int cntRoom = db.checkRoom(room_id.toString());
@@ -95,7 +128,7 @@ public class ScanActivity extends AppCompatActivity {
                 if (cnt == 0) {
 
                     //เลขมิเตอร์หลังต้องมากกว่าหรือเท่ากับ
-                    if ( Float.valueOf(meterEnd) >= Float.valueOf(meterStart)) {
+                    if (Float.valueOf(meterEnd) >= Float.valueOf(meterStart)) {
                         db.createMeter(room_id, month, term, year, meterStart, meterEnd, 0);
 
                         Toast.makeText(this, "บันทึกข้อมูลเรียบร้อย", Toast.LENGTH_LONG).show();
@@ -144,9 +177,21 @@ public class ScanActivity extends AppCompatActivity {
         if (result != null) {
             String contents = result.getContents();
             if (contents != null) {
+                db = new DatabaseHelper(getApplicationContext());
+                sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+                int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+                int thisYear = Calendar.getInstance().get(Calendar.YEAR) + 543;
+
+                String month = sharedPreferences.getString(QuickstartPreferences.MONTHS, String.valueOf(currentMonth));
+                String term = sharedPreferences.getString(QuickstartPreferences.TERMS, "1");
+                String year = sharedPreferences.getString(QuickstartPreferences.YEARS, String.valueOf(thisYear));
                 etRoomId = (EditText) findViewById(R.id.room_id);
                 etMeter = (EditText) findViewById(R.id.meter_end);
                 etRoomId.setText(result.getContents().toString());
+                String meterStart = db.lastMeter(result.getContents().toString(), Integer.valueOf(month), Integer.valueOf(term), year);
+                txtMeter = (TextView) findViewById(R.id.txtMeterStart);
+                txtMeter.setText("   ครั้งก่อน: " + meterStart);
                 etMeter.requestFocus();
                 //showDialog(R.string.result_succeeded, result.toString());
             } else {
